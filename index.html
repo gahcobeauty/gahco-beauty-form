@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GahCo.Beauty Studio - Formulário</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<style>
+  body {
+    font-family: 'Jost', sans-serif;
+    background-color: #ffe6f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+
+  /* overlay de carregamento */
+  #loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* card branco com spinner e texto */
+  #loading-overlay .card {
+    background: #fff;
+    padding: 18px 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    min-width: 220px;
+  }
+
+  /* spinner simples */
+  .spinner {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 4px solid rgba(0, 0, 0, 0.12);
+    border-top-color: #e91e63;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px auto;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* mensagem menor */
+  #loading-overlay p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .container {
+    margin: 0 auto;
+    max-width: 500px;
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    /* padrão, mas garante que não seja empurrado */
+  }
+
+
+
+  /* === Fade-in suave na logo === */
+  .logo-wrapper {
+    width: 100%;
+    max-width: 400px;
+    height: 120px;
+    /* altura fixa para não empurrar o container */
+    border-radius: 20px;
+    /* cantos arredondados */
+    overflow: hidden;
+    /* garante que a borda seja aplicada */
+    margin-bottom: 15px;
+  }
+
+  img.logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* preenche todo o wrapper mantendo proporção */
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: block;
+  }
+
+  img.logo.visible {
+    opacity: 1;
+  }
+
+  h2 {
+    color: #e91e63;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 12px 15px;
+    margin: 0 0 15px 0;
+    width: 100%;
+    border: 1px solid #f5b6cc;
+    border-radius: 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    box-sizing: border-box;
+
+  }
+
+  #lbl-termo {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: #e91e63;
+    text-align: center;
+  }
+
+
+  /* textarea autoFit já tinha padding, mas podemos reforçar para consistência */
+  textarea.autoFit {
+    padding: 12px 15px;
+    width: 100%;
+    overflow: hidden;
+    resize: none !important;
+    box-sizing: border-box;
+    line-height: 1.5;
+    font-family: inherit;
+    border: 1px solid #f5b6cc;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .btn {
+    background: #e91e63;
+    border: 2px solid #ec105d;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #ffffff;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .btn:hover {
+    transform: scale(1.03);
+  }
+
+  .btn-submit:hover {
+    transform: scale(1.03);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    margin-top: 25px;
+  }
+
+  .language-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .lang-btn {
+    background: #fdf1f7;
+    border: 2px solid #f5b6cc;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #555;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .lang-btn:hover {
+    background: #fce4ec;
+    border-color: #e91e63;
+    color: #e91e63;
+    transform: scale(1.03);
+  }
+
+  .lang-btn.active {
+    background: #e91e63;
+    color: white;
+    border-color: #e91e63;
+    transform: scale(1.05);
+  }
+
+  .checkbox-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    color: #444;
+    line-height: 1.5;
+    width: 100%;
+    text-align: left;
+  }
+
+  .checkbox-line input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #e91e63;
+    margin-left: 20px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .checkbox-line span {
+    flex: 1;
+    text-align: left;
+    margin-right: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 25px 18px;
+    }
+
+    h2 {
+      font-size: 16px;
+    }
+
+    .btn,
+    .lang-btn {
+      font-size: 15px;
+    }
+  }
+</style>
+
+<body>
+  <div class="logo-wrapper">
+    <img src="logo.webp" alt="Logo" class="logo">
+  </div>
+  <div class="container">
+
+    <!-- Página 1: Seleção de idioma -->
+    <div id="language-page">
+      <h2>Selecione seu idioma / Select your language / Seleccione su idioma</h2>
+      <div class="language-buttons">
+        <button class="lang-btn" data-lang="pt">🇧🇷 Português</button>
+        <button class="lang-btn" data-lang="en">🇺🇸 English</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+      </div>
+      <button class="btn" id="lang-next">Próximo / Next / Siguiente</button>
+    </div>
+
+    <!-- Página 2: Formulário -->
+    <form id="consent-form" class="hidden">
+      <h2 id="form-title"></h2>
+
+      <label for="nome" id="lbl-nome"></label>
+      <input type="text" id="nome" required>
+
+      <label for="data" id="lbl-data"></label>
+      <input type="date" id="data" required>
+
+      <label for="hora" id="lbl-hora"></label>
+      <input type="time" id="hora" required>
+
+      <label for="alergia" id="lbl-alergia"></label>
+      <select id="alergia" required></select>
+
+      <div id="alergia-extra" class="hidden">
+        <label for="qual" id="lbl-qual"></label>
+        <input type="text" id="qual">
+      </div>
+
+      <label id="lbl-termo"></label>
+      <textarea class="autoFit" id="termos" readonly></textarea>
+
+
+
+      <label class="checkbox-line">
+        <input type="checkbox" id="aceito" required>
+        <span id="lbl-aceito"></span>
+      </label>
+
+      <button type="submit" class="btn btn-submit" id="btn-enviar"></button>
+    </form>
+
+    <!-- Página 3: Confirmação -->
+    <div id="confirmation-page" class="hidden">
+      <h2 id="msg-title"></h2>
+      <p id="msg-body"></p>
+    </div>
+  </div>
+
+  <footer>© 2025 GahCo.Beauty - Todos os direitos reservados.</footer>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const servicoSelecionado = urlParams.get('service') || 'extensao';
+
+    /* === Seleção de idioma === */
+    const langButtons = document.querySelectorAll(".lang-btn");
+    let selectedLang = "";
+
+    langButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        langButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedLang = btn.getAttribute("data-lang");
+      });
+    });
+
+    document.getElementById("lang-next").addEventListener("click", () => {
+      if (!selectedLang) {
+        alert("Por favor, selecione um idioma / Please select a language / Por favor, seleccione un idioma");
+        return;
+      }
+      document.getElementById("language-page").classList.add("hidden");
+      showForm(selectedLang);
+    });
+
+    /* === Conteúdo de cada serviço === */
+    const conteudoServicos = {
+      extensao: {
+        pt: {
+          formTitle: "Extensão de Cílios - Orientações e Termos",
+          termos: ` POLÍTICA DE AGENDAMENTO:
+
+Se acontecer qualquer imprevisto, por favor, avise com pelo menos 48 horas de antecedência para que eu possa reorganizar minha agenda e continuar oferecendo um atendimento especial a todos. 
+
+Caso não compareça e não avise previamente, poderá ser cobrada uma taxa de “no-show”.
+
+ANTES DO PROCEDIMENTO: 
+
+• Por favor, venha sem maquiagem nos olhos ou no rosto.
+
+• Caso esteja com extensão de cílios feita por outro profissional, será cobrada uma taxa de remoção no valor de R$30.
+
+• Evite o uso de lente de contato durante o atendimento (traga seu estojo, se necessário).
+
+• Caso ocorra queda excessiva dos cílios após o procedimento, entre em contato para avaliarmos e realizarmos o devido atendimento sem custo adicional. Após esse período, será considerado sessão de manutenção (1 semana) e o valor correspondente será aplicado.
+
+• Caso ocorra qualquer reação alérgica após o procedimento, entre em contato para avaliarmos e realizarmos o devido atendimento sem custo adicional. O valor do procedimento não é reembolsável, mesmo em casos de alergia, já que o tempo e os produtos são utilizados durante a aplicação.
+
+• Há um tempo limite de tolerância de 15 minutos para atrasos. Após esse tempo, o agendamento será considerado “no-show”.`,
+
+        },
+        en: {
+          formTitle: "Eyelash Extension - Consent and Guidelines",
+          termos: ` POLICY FOR SCHEDULING:
+
+If any unforeseen event occurs, please notify me at least 48 hours in advance so I can reorganize my schedule and continue providing special care to all clients. 
+
+If you do not show up and fail to notify in advance, a “no-show” fee may be charged.
+
+ BEFORE THE PROCEDURE:
+
+• Please arrive without eye or face makeup.
+
+
+• If you already have lash extensions done by another professional, a removal fee of R$30 will be charged.
+
+• Avoid wearing contact lenses during the appointment (bring your case if necessary).
+
+• If you experience excessive lash loss after the procedure, please contact for a free touch-up evaluation. After this period, it will be considered a maintenance session (1 week) and the corresponding fee will apply.
+
+• If you experience any allergic reaction after the procedure, please contact for a free evaluation and follow-up. The procedure fee is non-refundable, even in cases of allergy, as the time and products are used during the application.
+
+• There is a 15-minute grace period for lateness. After that time, the appointment will be considered a “no-show.”`,
+
+        },
+        es: {
+          formTitle: "Extensión de Pestañas - Consentimiento y Orientaciones",
+          termos: ` POLÍTICA DE AGENDAMIENTO:
+
+Si ocurre algún imprevisto, por favor avísame con al menos 48 horas de anticipación para poder reorganizar mi agenda y seguir ofreciendo una atención especial a todos. 
+
+Si no asistes y no avisas con antelación, se podrá cobrar una tarifa por “no-show” (no asistencia).
+
+ ANTES DEL PROCEDIMIENTO:
+
+• Por favor, llega sin maquillaje en los ojos ni en el rostro.
+
+
+• Si tienes una extensión de pestañas realizada por otro profesional, se cobrará una tarifa de remoción de R$30.
+
+• Evita usar lentes de contacto durante la cita (trae tu estuche si es necesario).
+
+• Si ocurre caída excesiva de pestañas después del procedimiento, comunícate para una evaluación y corrección gratuita. Después de ese período, se considerará una sesión de mantenimiento (1 semana) y se aplicará la tarifa correspondiente.
+
+• Si ocurre alguna reacción alérgica después del procedimiento, comunícate para una evaluación y atención gratuita. El valor del procedimiento no es reembolsable, incluso en casos de alergia, ya que el tiempo y los productos se utilizan durante la aplicación.
+
+• Hay un límite de tolerancia de 15 minutos para retrasos. Pasado ese tiempo, la cita se considerará como “no-show.”`,
+
+        }
+      },
+      lashbrow: {
+        pt: {
+          formTitle: "Lash Lifting / Brow Lamination - Orientações e Termos",
+          termos: ` POLÍTICA DE AGENDAMENTO:
+
+Se acontecer qualquer imprevisto, por favor, me avise com pelo menos 48 horas de antecedência para que eu possa reorganizar minha agenda e continuar oferecendo um atendimento especial a todos. 
+
+Caso não compareça e não avise previamente, poderá ser cobrada uma taxa de “no-show”.
+
+ ANTES DO PROCEDIMENTO:
+
+• Evite o uso de maquiagem nos olhos e sobrancelhas no dia do atendimento.
+
+• Não faça procedimentos faciais (limpeza de pele, peeling, dermaplaning, etc.) 2 semanas antes ou depois do Lash Lift ou Brow Lamination.
+
+• Avise com antecedência se tem histórico de alergias a coloração, henna, tintura de cabelo, ou produtos químicos.
+
+• Caso ocorra qualquer reação alérgica após o procedimento, entre em contato conosco para avaliarmos e realizarmos o devido atendimento sem custo adicional. Em casos mais graves, procure um médico.
+
+• O valor do procedimento não é reembolsável, mesmo em casos de alergia, já que o tempo e os produtos são utilizados durante a aplicação.
+
+• Não utilize cremes, óleos ou hidratantes na área dos olhos e sobrancelhas no dia.
+
+• Em casos de gravidez ou amamentação, o procedimento somente poderá ser realizado com autorização médica
+
+• Se você fez botox ou preenchimento facial recentemente, aguarde pelo menos 2 semanas antes de realizar o procedimento.
+
+• Evite o uso de lente de contato no momento do atendimento (traga seu estojo, se necessário).
+
+• Há um tempo limite de tolerância de 15 minutos para atrasos. Após esse tempo, o agendamento será considerado “no-show”.`,
+
+        },
+        en: {
+          formTitle: "Lash Lifting / Brow Lamination - Guidelines & Consent",
+          termos: ` POLICY FOR SCHEDULING:
+
+If any unforeseen event occurs, please notify me at least 48 hours in advance so I can reorganize my schedule and continue providing special care to all clients. 
+
+If you do not show up and fail to notify in advance, a “no-show” fee may be charged.
+
+ BEFORE THE PROCEDURE:
+
+• Avoid using makeup on eyes and eyebrows on the day of the appointment.
+
+• Do not perform facial treatments (skin cleansing, peeling, dermaplaning, etc.) 48 hours before or after Lash Lift or Brow Lamination.
+
+• Inform me in advance if you have a history of allergies to dye, henna, hair color, or chemical products.
+
+• If any allergic reaction occurs after the procedure, contact me for a free follow-up appointment. In more severe cases, seek medical attention.
+
+• The procedure fee is non-refundable, even in allergy cases, since the time and products are used during the application.
+
+• Do not use creams, oils, or moisturizers around the eye and brow area on the day.
+
+• In cases of pregnancy or breastfeeding, the procedure can only be performed with medical authorization.
+
+• If you recently had botox or facial fillers, wait at least 2 weeks before scheduling.
+
+• Avoid wearing contact lenses during the appointment (bring your case if necessary).
+
+• There is a 15-minute grace period for lateness. After that, the appointment will be considered a “no-show.”`,
+
+        },
+        es: {
+          formTitle: "Lash Lifting / Brow Lamination - Orientaciones y Consentimiento",
+          termos: ` POLÍTICA DE AGENDAMIENTO:
+          
+Si ocurre algún imprevisto, por favor avísame con al menos 48 horas de anticipación para poder reorganizar mi agenda y seguir ofreciendo una atención especial a todos. 
+
+Si no asistes y no avisas con antelación, se podrá cobrar una tarifa por “no-show.”
+
+ ANTES DEL PROCEDIMIENTO:
+
+• Evita usar maquillaje en los ojos y cejas el día de la cita.
+
+• No realices procedimientos faciales (limpieza, peeling, dermaplaning, etc.) 48 horas antes o después del Lash Lift o Brow Lamination.
+
+• Informa con antelación si tienes historial de alergias a tintes, henna, coloraciones capilares o productos químicos.
+
+• Si ocurre alguna reacción alérgica después del procedimiento, comunícate para una evaluación y atención gratuita. En casos más graves, busca atención médica.
+
+• El valor del procedimiento no es reembolsable, incluso en casos de alergia, ya que el tiempo y los productos se utilizan durante la aplicación.
+
+• No uses cremas, aceites o hidratantes en el área de ojos y cejas el día de la cita.
+
+• En caso de embarazo o lactancia, el procedimiento solo se podrá realizar con autorización médica.
+
+• Si te realizaste botox o relleno facial recientemente, espera al menos 2 semanas antes de realizar el procedimiento.
+
+• Evita usar lentes de contacto durante la cita (trae tu estuche si es necesario).
+
+• Hay un límite de tolerancia de 15 minutos para retrasos. Pasado ese tiempo, la cita se considerará como “no-show.”`,
+
+        }
+      },
+      henna: {
+        pt: {
+          formTitle: "Tint / Henna - Orientações e Termos",
+          termos: ` POLÍTICA DE AGENDAMENTO:
+
+Se acontecer qualquer imprevisto, por favor, avise com pelo menos 48 horas de antecedência para que eu possa reorganizar minha agenda e continuar oferecendo um atendimento especial a todos. 
+
+Caso não compareça e não avise previamente, poderá ser cobrada uma taxa de “no-show”.
+
+ ANTES DO PROCEDIMENTO:
+
+• Venha com a pele limpa e sem maquiagem nas sobrancelhas.
+
+• Evite usar cremes, protetor solar ou óleos na região das sobrancelhas no dia.
+
+• Não faça limpeza de pele, peeling, dermaplaning ou outros procedimentos faciais nas 2 semanas antes e depois da aplicação da henna ou tint.
+
+• Avise com antecedência se já teve alguma reação alérgica a produtos como tintura de cabelo, henna, ou coloração para sobrancelhas.
+
+• Em casos de gravidez ou amamentação, o procedimento somente poderá ser realizado com autorização médica
+
+• Caso ocorra qualquer reação alérgica após o procedimento, entre em contato em para avaliarmos e realizarmos o devido atendimento sem custo adicional. 
+
+• O valor do procedimento não é reembolsável, mesmo em casos de alergia, já que o tempo e os produtos são utilizados durante a aplicação.
+
+• A duração média do resultado é de 4 a 7 dias, podendo variar conforme o tipo de pele e os cuidados pós-procedimento. Lembre-se: cada pele reage de forma diferente, e o resultado pode variar de pessoa para pessoa.
+
+• Há um tempo limite de tolerância de 15 minutos para atrasos. Após esse tempo, o agendamento será considerado “no-show”.`
+
+        },
+        en: {
+          formTitle: "Tint / Henna - Guidelines & Consent",
+          termos: ` POLICY FOR SCHEDULING:
+
+If any unforeseen event occurs, please notify me at least 48 hours in advance so I can reorganize my schedule and continue providing special care to all clients. 
+
+If you do not show up and fail to notify in advance, a “no-show” fee may be charged.
+
+ BEFORE THE PROCEDURE:
+
+• Arrive with clean skin and no makeup on your eyebrows.
+
+• Avoid using creams, sunscreen, or oils on the brow area on the day of your appointment.
+
+• Do not undergo skin cleansing, peeling, dermaplaning, or other facial procedures for 2 weeks before or after the henna or tint application.
+
+• Inform in advance if you’ve ever had an allergic reaction to hair dye, henna, or eyebrow tint.
+
+• In cases of pregnancy or breastfeeding, the procedure can only be performed with medical authorization.
+
+• If any allergic reaction occurs after the procedure, contact me for a free evaluation and follow-up.
+
+• The procedure fee is non-refundable, even in allergy cases, since the time and products are used during the application.
+
+• The average duration of results is 4 to 7 days, which may vary according to skin type and aftercare. Remember: every skin reacts differently, and results may vary from person to person.
+
+• There is a 15-minute grace period for lateness. After that, the appointment will be considered a “no-show.”`
+
+        },
+        es: {
+          formTitle: "Tint / Henna - Orientaciones y Consentimiento",
+          termos: ` POLÍTICA DE AGENDAMIENTO:
+Si ocurre algún imprevisto, por favor avísame con al menos 48 horas de anticipación para poder reorganizar mi agenda y seguir ofreciendo una atención especial a todos.
+
+Si no asistes y no avisas con antelación, se podrá cobrar una tarifa por “no-show.”
+
+ ANTES DEL PROCEDIMIENTO:
+
+• Llega con la piel limpia y sin maquillaje en las cejas.
+
+• Evita usar cremas, protector solar o aceites en la zona de las cejas el día de la cita.
+
+• No realices limpieza facial, peeling, dermaplaning u otros procedimientos faciales durante las 2 semanas antes o después de la aplicación de henna o tintura.
+
+• Informa con antelación si has tenido alguna reacción alérgica a tintes capilares, henna o colorantes para cejas.
+
+• En caso de embarazo o lactancia, el procedimiento solo se podrá realizar con autorización médica.
+
+• Si ocurre alguna reacción alérgica después del procedimiento, comunícate para una evaluación gratuita.
+
+• El valor del procedimiento no es reembolsable, incluso en casos de alergia, ya que el tiempo y los productos se utilizan durante la aplicación.
+
+• La duración promedio del resultado es de 4 a 7 días, y puede variar según el tipo de piel y los cuidados posteriores. Recuerda: cada piel reacciona de manera diferente y los resultados pueden variar de una persona a otra.
+
+• Hay un límite de tolerancia de 15 minutos para retrasos. Pasado ese tiempo, la cita se considerará como “no-show.”`
+
+        }
+      },
+      makeup: {
+        pt: {
+          formTitle: "Make-up - Orientações e Termos",
+          termos: ` POLÍTICA DE AGENDAMENTO:
+
+Se acontecer qualquer imprevisto, por favor, avise dentro de 48 horas após a reserva para que eu possa reorganizar minha agenda e continuar oferecendo um atendimento especial a todos.
+
+Caso não compareça e não avise dentro desse prazo, poderá ser cobrada uma taxa de “no-show” e o pagamento não será reembolsado devido à perda da data.
+
+ ANTES DO PROCEDIMENTO:
+
+• Tolerância: Há um tempo de tolerância de 15 minutos após o horário marcado. Caso o atraso ultrapasse esse limite, o atendimento poderá ser cancelado (a nosso critério) e o sinal não será reembolsado. Após esse tempo, o agendamento será considerado “no-show”.
+
+• Rosto limpo: Por favor, chegue sem maquiagem. Se você não tiver um hidratante adequado, não se preocupe! A preparação personalizada da pele está incluída no serviço.
+
+• Alergias: Se você tiver qualquer tipo de alergia (alimentar, a produtos, ingredientes ou animais), por favor, informe antes do agendamento, pois pode não haver tempo hábil para realizar o teste de sensibilidade. Certifique-se de incluir essa informação na observação ao fazer sua reserva.
+
+• Câmeras de segurança: Todas as sessões são gravadas por câmeras em tempo integral, para sua segurança e a minha. Caso precise trocar de roupa, utilize o banheiro.
+
+• Satisfação: Caso haja qualquer insatisfação ou algo que você não goste, comunique no momento do atendimento, para que possamos ajustar de acordo com sua preferência. Reclamações feitas após o término da sessão não serão reembolsadas, e não haverá devolução de valores.
+
+• Noivas: O Bridal Trial (teste de maquiagem) e o Wedding Day (dia do casamento) são serviços separados.
+
+ – O Bridal Trial tem duração de até 2 horas e inclui uma consulta detalhada com uma sessão completa de maquiagem personalizada antes do grande dia.
+
+ – O Wedding Day tem duração de até 3 horas.
+
+ – Caso o atendimento ultrapasse o tempo previsto, será cobrada uma taxa adicional de $100 por hora extra.`
+
+        },
+        en: {
+          formTitle: "Make-up - Guidelines & Consent",
+          termos: ` POLICY FOR SCHEDULING:
+
+If any unforeseen event occurs, please notify me within 48 hours after booking so I can reorganize my schedule and continue offering special service to all. 
+
+If you do not show up and fail to notify within this timeframe, a “no-show” fee will be charged and the payment will not be refunded due to the date loss.
+
+BEFORE THE PROCEDURE:
+
+• Punctuality: There is a 15-minute grace period after the scheduled time. If the delay exceeds this limit, the appointment may be canceled (at our discretion), and the deposit will not be refunded. After that, it will be considered a “no-show.”
+
+• Clean face: Please arrive without makeup. Don’t worry if you don’t have the right moisturizer—custom skin preparation is included in the service.
+
+• Allergies: If you have any allergies (food, product, ingredient, or animal-related), please inform before booking, as there may not be time to perform a patch test. Include this information in your booking notes.
+
+• Security cameras: All sessions are recorded continuously for your safety and mine. If you need to change clothes, please use the restroom.
+
+• Satisfaction: If you are dissatisfied or wish to make any adjustments, please communicate during the session so we can adapt to your preference. Complaints made after the session will not be refunded, and no value will be returned.
+
+• Brides: The Bridal Trial and Wedding Day are separate services.
+
+ – Bridal Trial: lasts up to 2 hours and includes a detailed consultation with a full personalized makeup session before the big day.
+
+ – Wedding Day: lasts up to 3 hours.
+
+ – If the service exceeds the expected duration, an additional fee of $100 per extra hour will be charged.`
+
+        },
+        es: {
+          formTitle: "Make-up - Orientaciones y Consentimiento",
+          termos: ` POLÍTICA DE AGENDAMIENTO:
+
+Si ocurre algún imprevisto, por favor avísame dentro de las 48 horas posteriores a la reserva para poder reorganizar mi agenda y seguir ofreciendo una atención especial a todos.
+
+Si no asistes y no avisas dentro de ese plazo, se podrá cobrar una tarifa por “no-show” y el pago no será reembolsado debido a la pérdida de la fecha.
+
+ ANTES DEL PROCEDIMIENTO:
+
+• Puntualidad: Hay un límite de tolerancia de 15 minutos después del horario programado. Si el retraso supera ese límite, la cita podrá ser cancelada (a nuestro criterio) y la seña no será reembolsada. Después de ese tiempo, se considerará “no-show.”
+
+• Rostro limpio: Por favor, llega sin maquillaje. Si no tienes un hidratante adecuado, ¡no te preocupes! La preparación personalizada de la piel está incluida en el servicio.
+
+• Alergias: Si tienes cualquier tipo de alergia (alimentaria, a productos, ingredientes o animales), por favor, infórmalo antes de la reserva, ya que puede no haber tiempo suficiente para realizar la prueba de sensibilidad. Incluye esta información en la observación al hacer tu reserva.
+
+• Cámaras de seguridad: Todas las sesiones son grabadas de forma continua para tu seguridad y la mía. Si necesitas cambiarte de ropa, usa el baño.
+
+• Satisfacción: Si hay algo que no te guste o desees ajustar, comunícalo durante la sesión para que podamos adaptarlo según tu preferencia. Las reclamaciones realizadas después de la sesión no serán reembolsadas ni se devolverán valores.
+
+• Novias: El Bridal Trial (prueba de maquillaje) y el Wedding Day (día de la boda) son servicios separados.
+
+ – Bridal Trial: tiene una duración de hasta 2 horas e incluye una consulta detallada con una sesión completa de maquillaje personalizado antes del gran día.
+
+ – Wedding Day: tiene una duración de hasta 3 horas.
+
+ – Si el servicio excede el tiempo previsto, se cobrará una tarifa adicional de $100 por cada hora extra.`
+
+        }
+      }
+    };
+
+    /* === Função para exibir formulário === */
+    function showForm(lang) {
+      const servico = conteudoServicos[servicoSelecionado] || conteudoServicos['extensao'];
+      const t = servico[lang];
+
+      document.getElementById("consent-form").classList.remove("hidden");
+      document.getElementById("form-title").textContent = t.formTitle;
+      document.getElementById("lbl-nome").textContent = lang === 'pt' ? "Nome completo:" : lang === 'en' ? "Full Name:" : "Nombre completo:";
+      document.getElementById("lbl-data").textContent = lang === 'pt' ? "Data do procedimento:" : lang === 'en' ? "Procedure Date:" : "Fecha del procedimiento:";
+      document.getElementById("lbl-hora").textContent = lang === 'pt' ? "Horário do procedimento:" : lang === 'en' ? "Procedure Time:" : "Hora del procedimiento:";
+      document.getElementById("lbl-alergia").textContent = lang === 'pt' ? "Possui alguma alergia?" : lang === 'en' ? "Do you have any allergies?" : "¿Tiene alguna alergia?";
+      document.getElementById("lbl-qual").textContent = lang === 'pt' ? "Se sim, qual?" : lang === 'en' ? "If so, which one?" : "Si es así, ¿cuál?";
+      document.getElementById("lbl-termo").textContent = lang === 'pt' ? "LEIA OS TERMOS ABAIXO:" : lang === 'en' ? "READ THE TERMS BELOW:" : "LEA LOS TÉRMINOS A CONTINUACIÓN:";
+      document.getElementById("lbl-aceito").textContent = lang === 'pt' ? "Declaro que li e estou de acordo com os termos." : lang === 'en' ? "I declare that I have read and agree to the terms." : "Declaro que he leído y estoy de acuerdo con los términos.";
+      document.getElementById("btn-enviar").textContent = lang === 'pt' ? "Enviar" : lang === 'en' ? "Submit" : "Enviar";
+      document.querySelector("footer").textContent = lang === 'pt' ? "© 2025 GahCo.Beauty - Todos os direitos reservados." : lang === 'en' ? "© 2025 GahCo.Beauty - All rights reserved." : "© 2025 GahCo.Beauty - Todos los derechos reservados.";
+
+      document.getElementById("termos").value = t.termos;
+
+      // auto-resize
+      const taTermos = document.getElementById("termos");
+      [taTermos].forEach(ta => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+
+      const alergiaSelect = document.getElementById("alergia");
+const alergiaExtra = document.getElementById("alergia-extra");
+
+// Cria as opções do select de acordo com o idioma
+const placeholders = { pt: "Selecione", en: "Select", es: "Seleccione" };
+const optionsTexts = {
+  pt: ["Sim", "Não"],
+  en: ["Yes", "No"],
+  es: ["Sí", "No"]
+};
+
+const placeholder = placeholders[lang] || "Selecione";
+const options = optionsTexts[lang] || ["Sim", "Não"];
+
+// Cria opção placeholder
+const defaultOpt = document.createElement("option");
+defaultOpt.textContent = placeholder;
+defaultOpt.disabled = true;
+defaultOpt.selected = true;
+defaultOpt.hidden = true;
+alergiaSelect.appendChild(defaultOpt);
+
+// Cria opções reais (valor sempre em português)
+options.forEach(optText => {
+  const opt = document.createElement("option");
+  // Se português, usa exatamente o texto; se inglês ou espanhol, converte para "Sim"/"Não"
+  if(lang === "pt") {
+    opt.value = optText; // "Sim" ou "Não"
+  } else {
+    opt.value = (optText === "Yes" || optText === "Sí") ? "Sim" : "Não";
+  }
+  opt.textContent = optText;
+  alergiaSelect.appendChild(opt);
+});
+
+// Listener único
+alergiaSelect.addEventListener("change", () => {
+  const val = alergiaSelect.value; // será sempre "Sim" ou "Não"
+  if (val === "Sim") {
+    alergiaExtra.classList.remove("hidden");
+  } else {
+    alergiaExtra.classList.add("hidden");
+  }
+});
+
+      document.getElementById("msg-title").textContent = lang === 'pt' ? "Formulário enviado com sucesso!" : lang === 'en' ? "Form submitted successfully!" : "¡Formulario enviado con éxito!";
+      document.getElementById("msg-body").textContent = lang === 'pt' ? "Agradecemos seu preenchimento. Seus dados foram registrados com segurança." : lang === 'en' ? "Thank you for filling out the form. Your data has been securely recorded." : "Gracias por completar el formulario. Sus datos han sido registrados de forma segura.";
+     }
+    
+      /* === Funções de overlay/loading === */
+    function showLoading(lang) {
+      const loadingOverlay = document.getElementById("loading-overlay");
+      const loadingText = document.getElementById("loading-text");
+
+      let message = lang === "pt" ? "Enviando o formulário..." :
+        lang === "en" ? "Sending the form..." :
+          "Enviando el formulario...";
+
+      loadingText.textContent = message;
+      loadingOverlay.style.display = "flex";
+    }
+
+    function hideLoading() {
+      document.getElementById("loading-overlay").style.display = "none";
+    }
+
+    /* === Timeout fetch helper === */
+    function fetchWithTimeout(resource, options = {}, timeout = 12000) {
+      return Promise.race([
+        fetch(resource, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), timeout))
+      ]);
+    }
+
+    /* === Envio do formulário com spinner + timeout (Opção A) === */
+    document.getElementById("consent-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      showLoading(selectedLang);
+
+      const alergicoVal = document.getElementById("alergia").value;
+      let alergiasVal;
+
+      if (alergicoVal === "Sim" || alergicoVal === "Sim" || alergicoVal === "Sim") {
+        alergiasVal = document.getElementById("qual").value.trim() || (selectedLang === 'pt' ? "Não informado" : selectedLang === 'en' ? "Não informado" : "Não informado");
+      } else {
+        alergiasVal = selectedLang === 'pt' ? "Nenhuma" : selectedLang === 'en' ? "Nenhuma" : "Nenhuma";
+      }
+
+      const data = {
+        nome: document.getElementById("nome").value.trim(),
+        data: document.getElementById("data").value,
+        horario: document.getElementById("hora").value,
+        alergico: alergicoVal,
+        alergias: alergiasVal,
+        aceito: document.getElementById("aceito").checked ? "Sim" : "Não",
+        servico: servicoSelecionado,
+        lang: selectedLang,
+      };
+
+      try {
+        const response = await fetch("/api/sendForm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        hideLoading();
+
+        if (result.result === "success") {
+          document.getElementById("consent-form").classList.add("hidden");
+          document.getElementById("confirmation-page").classList.remove("hidden");
+        } else {
+          alert(selectedLang === "pt" ? "Ocorreu um erro ao enviar o formulário. Tente novamente." :
+            selectedLang === "en" ? "Error sending the form. Please try again." :
+              "Ocurrió un error al enviar el formulario. Intente nuevamente.");
+        }
+      } catch (error) {
+        hideLoading();
+        alert(selectedLang === "pt" ? "Ocorreu um erro ao enviar o formulário. Tente novamente." :
+          selectedLang === "en" ? "Error sending the form. Please try again." :
+            "Ocurrió un error al enviar el formulario. Intente nuevamente.");
+      }
+    });
+
+
+    /* === Auto-resize para textareas === */
+    function autoResizeTextarea(textarea) {
+      textarea.style.height = "auto"; // Reseta a altura
+      textarea.style.height = textarea.scrollHeight + "px"; // Define o tamanho exato do texto interno
+    }
+
+    document.querySelectorAll("textarea").forEach(textarea => {
+      // Ajusta ao carregar
+      autoResizeTextarea(textarea);
+      // Ajusta sempre que o conteúdo mudar
+      textarea.addEventListener("input", () => autoResizeTextarea(textarea));
+    });
+
+    // Aplica automaticamente uppercase a todos os inputs de texto
+    document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(input => {
+      input.addEventListener('input', () => {
+        input.value = input.value.toUpperCase();
+      });
+    });
+
+    window.addEventListener("load", () => {
+      const logo = document.querySelector(".logo");
+      logo.classList.add("visible"); // ativa fade-in
+    });
+
+
+
+  </script>
+  <!-- Loading overlay -->
+  <div id="loading-overlay" aria-hidden="true">
+    <div class="card">
+      <div class="spinner" role="status" aria-hidden="true"></div>
+      <p id="loading-text">Enviando o formulário...</p>
+    </div>
+  </div>
+
+</body>
+
+</html>
